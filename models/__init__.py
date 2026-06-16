@@ -5,10 +5,15 @@ Available architectures:
 - BaselineMultimodalModel: Simple CNN+MLP fusion (fast, no attention)
 - ImageDifferenceCNNModel: Image-only CNN feature-difference classifier
 - WeatherGRUModel: Weather-only GRU temporal classifier
+- ImageDifferenceWeatherGRUModel: Image-difference + weather-GRU fusion classifier
 """
 
 from .baseline_model import BaselineMultimodalModel, create_baseline_model
 from .image_difference_model import ImageDifferenceCNNModel, create_image_difference_model
+from .image_weather_gru_model import (
+    ImageDifferenceWeatherGRUModel,
+    create_image_difference_weather_gru_model,
+)
 from .weather_gru_model import WeatherGRUModel, create_weather_gru_model
 
 __all__ = [
@@ -16,6 +21,8 @@ __all__ = [
     'create_baseline_model',
     'ImageDifferenceCNNModel',
     'create_image_difference_model',
+    'ImageDifferenceWeatherGRUModel',
+    'create_image_difference_weather_gru_model',
     'WeatherGRUModel',
     'create_weather_gru_model',
 ]
@@ -28,7 +35,8 @@ def create_model(arch_name, **kwargs):
     Parameters
     ----------
     arch_name : str
-        One of: 'BaselineMultimodalModel', 'ImageDifferenceCNNModel', 'WeatherGRUModel'
+        One of: 'BaselineMultimodalModel', 'ImageDifferenceCNNModel',
+        'WeatherGRUModel', 'ImageDifferenceWeatherGRUModel'
     **kwargs : dict
         Model-specific parameters
         
@@ -40,6 +48,8 @@ def create_model(arch_name, **kwargs):
         return create_baseline_model(**kwargs)
     elif arch_name == 'ImageDifferenceCNNModel':
         return create_image_difference_model(**kwargs)
+    elif arch_name == 'ImageDifferenceWeatherGRUModel':
+        return create_image_difference_weather_gru_model(**kwargs)
     elif arch_name == 'WeatherGRUModel':
         return create_weather_gru_model(**kwargs)
     else:
