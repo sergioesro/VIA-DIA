@@ -25,7 +25,7 @@ from lightning_module import DIA
 
 # WandB
 import wandb
-wandb.login(key='YOUR_WANDB_KEY_HERE')  # Replace with your actual WandB API key
+wandb.login(key='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')  # Replace with your actual WandB API key
 
 
 def main(config, config_file, arch, database):

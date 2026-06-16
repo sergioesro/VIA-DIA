@@ -20,3 +20,5 @@ databases/xBD
 wandb
 .vscode
 __pycache__
+
+.env
