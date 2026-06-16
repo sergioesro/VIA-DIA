@@ -21,6 +21,7 @@ VIA-DIA/
 ├── models/
 │   ├── baseline_model.py            # CNN + MLP multimodal baseline
 │   ├── image_difference_model.py    # Image-only CNN difference model
+│   ├── weather_gru_model.py         # Weather-only GRU temporal model
 │   └── shared_components.py         # Shared building blocks
 └── databases/
     └── xBDClimate_database.py       # Memory-mapped xBD + ERA-5 PyTorch dataset
@@ -41,6 +42,14 @@ Use the same config and switch only the architecture argument:
 
 ```bash
 python main.py -c configs/config_baseline.yaml -a ImageDifferenceCNNModel -d xBDClimate
+```
+
+## Train the Weather-Only GRU Model
+
+Use the same config and switch only the architecture argument:
+
+```bash
+python main.py -c configs/config_baseline.yaml -a WeatherGRUModel -d xBDClimate
 ```
 
 #### Author

@@ -161,8 +161,8 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', default='configs/config.yaml', type=str,
                       help='config file path (default: configs/config.yaml)')
     parser.add_argument('-a', '--arch', default='BaselineMultimodalModel', type=str,
-                      help=('architecture: BaselineMultimodalModel or ImageDifferenceCNNModel '
-                            '(default: BaselineMultimodalModel)'))
+                      help=('architecture: BaselineMultimodalModel, ImageDifferenceCNNModel, '
+                            'or WeatherGRUModel (default: BaselineMultimodalModel)'))
     parser.add_argument('-d', '--database', default='xBDClimate', type=str,
                       help='database name (default: xBDClimate)')
     parser.add_argument('--initial_weights', default="", type=str,
