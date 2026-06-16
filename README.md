@@ -20,6 +20,7 @@ VIA-DIA/
 │   └── config_interpretation.yaml   # Interpretation / saliency config
 ├── models/
 │   ├── baseline_model.py            # CNN + MLP multimodal baseline
+│   ├── image_difference_model.py    # Image-only CNN difference model
 │   └── shared_components.py         # Shared building blocks
 └── databases/
     └── xBDClimate_database.py       # Memory-mapped xBD + ERA-5 PyTorch dataset
@@ -32,6 +33,14 @@ Use the baseline notebook or
 
 ```bash
 python main.py -c configs/config_baseline.yaml -a BaselineMultimodalModel -d xBDClimate
+```
+
+## Train the Image-Only Difference Model
+
+Use the same config and switch only the architecture argument:
+
+```bash
+python main.py -c configs/config_baseline.yaml -a ImageDifferenceCNNModel -d xBDClimate
 ```
 
 #### Author

@@ -20,6 +20,9 @@ from lightning.pytorch.callbacks import ModelSummary, ModelCheckpoint, EarlyStop
 # Lightning module
 from lightning_module import DIA
 
+## How to run the code
+# python3 main.py -c configs/config_baseline.yaml -a ImageDifferenceCNNModel -d xBDClimate
+
 # WandB
 import wandb
 wandb.login(key='YOUR_WANDB_KEY_HERE')  # Replace with your actual WandB API key
@@ -158,7 +161,8 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', default='configs/config.yaml', type=str,
                       help='config file path (default: configs/config.yaml)')
     parser.add_argument('-a', '--arch', default='BaselineMultimodalModel', type=str,
-                      help='architecture: BaselineMultimodalModel (default: BaselineMultimodalModel)')
+                      help=('architecture: BaselineMultimodalModel or ImageDifferenceCNNModel '
+                            '(default: BaselineMultimodalModel)'))
     parser.add_argument('-d', '--database', default='xBDClimate', type=str,
                       help='database name (default: xBDClimate)')
     parser.add_argument('--initial_weights', default="", type=str,
