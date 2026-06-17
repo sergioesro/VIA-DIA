@@ -9,6 +9,7 @@ Available architectures:
 """
 
 from .baseline_model import BaselineMultimodalModel, create_baseline_model
+from .grad_cam import MultimodalGradCAM, get_target_layer, visualize_grad_cam
 from .image_difference_model import ImageDifferenceCNNModel, create_image_difference_model
 from .image_weather_gru_model import (
     ImageDifferenceWeatherGRUModel,
@@ -19,6 +20,9 @@ from .weather_gru_model import WeatherGRUModel, create_weather_gru_model
 __all__ = [
     'BaselineMultimodalModel',
     'create_baseline_model',
+    'MultimodalGradCAM',
+    'get_target_layer',
+    'visualize_grad_cam',
     'ImageDifferenceCNNModel',
     'create_image_difference_model',
     'ImageDifferenceWeatherGRUModel',
