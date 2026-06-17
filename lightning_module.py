@@ -502,7 +502,8 @@ class DIA(L.LightningModule):
                           f"p{int(patches_idx[s])}_climate.png", dpi=300, bbox_inches="tight")
                 plt.close(fig)
 
-    def grad_cam_interpretation(self, device='cpu', target_cat=None, max_samples=20):
+    def grad_cam_interpretation(self, device='cpu', target_cat=None, max_samples=20,
+                                one_per_class=False):
         """
         Run Grad-CAM on test samples and save overlay figures.
 
@@ -512,15 +513,24 @@ class DIA(L.LightningModule):
             'cpu' or 'cuda'
         target_cat : int or None
             If set, only process samples whose ground-truth label equals this class.
+            Ignored when one_per_class=True.
         max_samples : int
-            Stop after saving this many figures.
+            Stop after saving this many figures. Ignored when one_per_class=True.
+        one_per_class : bool
+            If True, collect exactly one sample per damage class (single pass through
+            the test set) and stop as soon as all classes are covered.
+
+        Returns
+        -------
+        saved : dict[int, str]
+            Maps class index → saved file path.
         """
         from models.grad_cam import visualize_grad_cam
         import os
 
         if not hasattr(self.model, 'visual_backbone'):
             print(f"Grad-CAM not applicable to {type(self.model).__name__} (no visual backbone).")
-            return
+            return {}
 
         save_dir = self.cfg['trainer']['save_dir']
         os.makedirs(save_dir, exist_ok=True)
@@ -538,16 +548,25 @@ class DIA(L.LightningModule):
         if patch_std is not None:
             patch_std = patch_std.numpy() if hasattr(patch_std, 'numpy') else np.asarray(patch_std)
 
+        num_classes = self.cfg['arch']['num_classes']
+        saved: dict[int, str] = {}   # class_idx → path (used in one_per_class mode)
         count = 0
+
         for batch in self.data_test:
             (patches_pre, patches_post, mask_patches, climate_series,
              event_labels, labels_pre, labels_post, event_names, patch_idxs) = batch
 
             for s in range(len(patches_pre)):
-                if target_cat is not None and labels_post[s].item() != target_cat:
-                    continue
-                if count >= max_samples:
-                    return
+                gt = int(labels_post[s].item())
+
+                if one_per_class:
+                    if gt in saved:
+                        continue
+                else:
+                    if target_cat is not None and gt != target_cat:
+                        continue
+                    if count >= max_samples:
+                        return saved
 
                 x_pre = patches_pre[[s]].to(device)
                 x_post = patches_post[[s]].to(device)
@@ -555,10 +574,13 @@ class DIA(L.LightningModule):
                 ev_labels = event_labels[[s]].to(device) if event_labels is not None else None
 
                 name = event_names[s].split('/')[-1][:-3] if isinstance(event_names[s], str) else str(s)
-                save_path = os.path.join(
-                    save_dir,
-                    f"{name}_p{int(patch_idxs[s])}_gradcam.png",
+                cls_name = list(damage_classes.keys())[gt] if damage_classes else str(gt)
+                filename = (
+                    f"class{gt}_{cls_name}_{name}_p{int(patch_idxs[s])}_gradcam.png"
+                    if one_per_class
+                    else f"{name}_p{int(patch_idxs[s])}_gradcam.png"
                 )
+                save_path = os.path.join(save_dir, filename)
 
                 pred_class = visualize_grad_cam(
                     model=self.model,
@@ -570,7 +592,7 @@ class DIA(L.LightningModule):
                     patch_mean=patch_mean,
                     patch_std=patch_std,
                     damage_classes=damage_classes,
-                    gt_label=int(labels_post[s].item()),
+                    gt_label=gt,
                     sample_name=name,
                 )
 
@@ -584,5 +606,14 @@ class DIA(L.LightningModule):
                     except Exception as e:
                         print(f"Warning: could not log Grad-CAM to W&B: {e}")
 
-                print(f"[Grad-CAM] saved {save_path}  pred={pred_class}")
-                count += 1
+                print(f"[Grad-CAM] class {gt} ({cls_name}) → {save_path}  pred={pred_class}")
+
+                if one_per_class:
+                    saved[gt] = save_path
+                    if len(saved) == num_classes:
+                        return saved
+                else:
+                    saved[count] = save_path
+                    count += 1
+
+        return saved
